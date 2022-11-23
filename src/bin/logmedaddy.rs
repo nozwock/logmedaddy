@@ -1,6 +1,6 @@
 use clap::Parser;
-use logmedaddy::args::Cli;
+use logmedaddy::Args;
 
 fn main() {
-    let _cli = Cli::parse();
+    let _cli = Args::parse();
 }
