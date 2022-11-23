@@ -1,0 +1,18 @@
+[package]
+name = "logmedaddy"
+description = "hmph..."
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.66"
+clap = { version = "4.0.26", features = ["derive"] }
+confy = { version = "0.5.1", default-features = false, features = ["ron_conf"] }
+
+[profile.release]
+strip = true
+lto = true
+opt-level = "s"
+panic = "abort"
