@@ -24,3 +24,13 @@ impl Default for Config {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn gen_config() {
+        confy::store_path("./target/logmedaddy.ron", Config::default()).unwrap();
+    }
+}
