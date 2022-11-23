@@ -1,7 +1,8 @@
+use crate::defines::app_config_path;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Config {
+pub struct Config {
     profiles: Vec<Profile>,
 }
 
@@ -22,6 +23,15 @@ impl Default for Config {
                 ],
             }],
         }
+    }
+}
+
+impl Config {
+    pub fn load() -> Config {
+        confy::load_path(app_config_path()).unwrap_or_default()
+    }
+    pub fn store(self) -> anyhow::Result<()> {
+        Ok(confy::store_path(app_config_path(), self)?)
     }
 }
 
