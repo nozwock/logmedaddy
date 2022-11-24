@@ -22,6 +22,13 @@ fn main() -> anyhow::Result<()> {
         println!("{}", defines::app_config_path().to_string_lossy());
     };
 
+    if cli.all {
+        let log_path = "./logmedaddy.log";
+        File::create(log_path)?
+            .write_all(log_profiles(cfg.profiles.iter().collect::<Vec<_>>()).as_bytes())?;
+        println!("Log successfully saved at {:?}", log_path);
+    }
+
     if let Some(profile) = &cli.profile {
         let log_path = "./logmedaddy.log";
         match cfg.profiles.iter().find(|&x| &x.name == profile) {
@@ -37,9 +44,10 @@ fn main() -> anyhow::Result<()> {
         };
     };
 
-    // TODO: ability to pass multiple profiles
+    // TODO: add an -o option
     // // TODO: obv impl the -p and -l options
     // // TODO: --config_path flag to print config path
+    // TODO: ability to pass multiple profiles
     // TODO: auto completion for shell?
 
     Ok(())
