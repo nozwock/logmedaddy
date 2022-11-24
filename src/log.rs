@@ -1,11 +1,11 @@
 use crate::config::Profile;
 use std::process::Command;
 
-pub fn log_profiles(profiles: Vec<Profile>) -> String {
+pub fn log_profiles(profiles: Vec<&Profile>) -> String {
     let mut out = Vec::new();
     for profile in profiles {
         out.push(wrap_string(&profile.name, "#", 10)); // push profile name
-        for logger in profile.loggers {
+        for logger in &profile.loggers {
             out.push(wrap_string(&logger, "+", 10)); // push logger name
             let log = log_from_logger(&logger);
             if let Some(log) = log {

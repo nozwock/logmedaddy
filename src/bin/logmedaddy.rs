@@ -2,18 +2,40 @@ use clap::Parser;
 use logmedaddy::Args;
 
 fn main() {
-    let _cli = Args::parse();
+    let cli = Args::parse();
+    let cfg = logmedaddy::Config::load();
 
-    let _cfg = logmedaddy::Config::load();
-    dbg!(&_cfg);
+    match &cli.list {
+        true => {
+            println!(
+                "Available profiles:\n{}",
+                cfg.profiles
+                    .iter()
+                    .map(|profile| profile.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            );
+        }
+        false => {}
+    };
 
-    // mock tests
-    use std::io::Write;
-    let log = logmedaddy::log_profiles(_cfg.profiles);
-    std::fs::File::create("./logmedaddy.log")
-        .unwrap()
-        .write_all(log.as_bytes())
-        .unwrap();
+    match &cli.profile {
+        Some(profile) => {
+            use std::io::Write;
+            let log_path = "./logmedaddy.log";
+            let log = logmedaddy::log_profiles(vec![cfg
+                .profiles
+                .iter()
+                .find(|&x| &x.name == profile)
+                .unwrap()]);
+            std::fs::File::create(log_path)
+                .unwrap()
+                .write_all(log.as_bytes())
+                .unwrap();
+            println!("Log successfully saved at {:?}", log_path);
+        }
+        None => {}
+    };
 
     // TODO: ability to pass multiple profiles
     // TODO: obv impl the -p and -l options
