@@ -3,13 +3,13 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    profiles: Vec<Profile>,
+    pub profiles: Vec<Profile>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Profile {
-    name: String,
-    loggers: Vec<String>,
+pub struct Profile {
+    pub name: String,
+    pub loggers: Vec<String>,
 }
 
 impl Default for Config {
@@ -36,7 +36,7 @@ impl Config {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]
