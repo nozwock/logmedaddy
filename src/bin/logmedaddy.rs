@@ -1,11 +1,18 @@
 use clap::Parser;
-use std::{fs::File, io::Write, process::exit};
+use std::{fs::File, io::Write, path::Path, process::exit};
 
 use logmedaddy::{defines, log_profiles, Args};
 
 fn main() -> anyhow::Result<()> {
     let cli = Args::parse();
     let cfg = logmedaddy::Config::load();
+
+    let log_path = if let Some(out) = &cli.output {
+        out
+    } else {
+        "logmedaddy.log"
+    };
+    let log_path = Path::new(log_path);
 
     if cli.list {
         println!(
@@ -23,14 +30,12 @@ fn main() -> anyhow::Result<()> {
     };
 
     if cli.all {
-        let log_path = "./logmedaddy.log";
         File::create(log_path)?
             .write_all(log_profiles(cfg.profiles.iter().collect::<Vec<_>>()).as_bytes())?;
         println!("Log successfully saved at {:?}", log_path);
     }
 
     if let Some(profile) = &cli.profile {
-        let log_path = "./logmedaddy.log";
         match cfg.profiles.iter().find(|&x| &x.name == profile) {
             Some(profile) => {
                 let log = log_profiles(vec![profile]);
@@ -44,7 +49,7 @@ fn main() -> anyhow::Result<()> {
         };
     };
 
-    // TODO: add an -o option
+    // // TODO: add an -o option
     // // TODO: obv impl the -p and -l options
     // // TODO: --config_path flag to print config path
     // TODO: ability to pass multiple profiles

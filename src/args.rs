@@ -20,6 +20,10 @@ pub struct Args {
     #[arg(short, long)]
     pub all: bool,
 
+    /// Set output log file name
+    #[arg(short, long, requires = "log", value_name = "FILE")]
+    pub output: Option<String>,
+
     /// Print available profiles
     #[arg(short, long)]
     pub list: bool,
