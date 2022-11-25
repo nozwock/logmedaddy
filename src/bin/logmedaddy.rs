@@ -1,4 +1,5 @@
 use clap::Parser;
+use colored::*;
 use std::{fs::File, io::Write, path::Path, process::exit};
 
 use logmedaddy::{defines, log_profiles, Args};
@@ -15,13 +16,14 @@ fn main() -> anyhow::Result<()> {
     let log_path = Path::new(log_path);
 
     if cli.list {
+        let space = " ".repeat(4);
         println!(
-            "Available profiles:\n{}",
+            "Available profiles:\n{space}{}",
             cfg.profiles
                 .iter()
                 .map(|profile| profile.name.as_str())
                 .collect::<Vec<_>>()
-                .join("\n")
+                .join(&format!("\n{space}"))
         );
     };
 
@@ -30,9 +32,9 @@ fn main() -> anyhow::Result<()> {
     };
 
     if cli.all {
-        File::create(log_path)?
-            .write_all(log_profiles(cfg.profiles.iter().collect::<Vec<_>>()).as_bytes())?;
-        println!("Log successfully saved at {:?}", log_path);
+        let log = log_profiles(cfg.profiles.iter().collect::<Vec<_>>());
+        File::create(log_path)?.write_all(log.as_bytes())?;
+        println!("{} {:?}", "Log successfully saved at".green(), log_path);
     }
 
     if let Some(profile) = &cli.profile {
@@ -40,10 +42,10 @@ fn main() -> anyhow::Result<()> {
             Some(profile) => {
                 let log = log_profiles(vec![profile]);
                 File::create(log_path)?.write_all(log.as_bytes())?;
-                println!("Log successfully saved at {:?}", log_path);
+                println!("{} {:?}", "Log successfully saved at".green(), log_path);
             }
             None => {
-                println!("No such profile exists!");
+                println!("{} '{}'", "Profile not found:".red(), profile.yellow());
                 exit(1);
             }
         };
@@ -52,6 +54,9 @@ fn main() -> anyhow::Result<()> {
     // // TODO: add an -o option
     // // TODO: obv impl the -p and -l options
     // // TODO: --config_path flag to print config path
+    // TODO:? number profiles; mention profiles by number
+    // TODO: option to panic upon log fail
+    // TODO: option to split the output log file by profiles
     // TODO: ability to pass multiple profiles
     // TODO: auto completion for shell?
 

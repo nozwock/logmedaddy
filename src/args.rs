@@ -12,11 +12,11 @@ use clap::{ArgGroup, Parser};
                 .args(["profile", "all"])
         ))]
 pub struct Args {
-    /// Use given profile for logs
+    /// Use the given profile for log
     #[arg(short, long)]
     pub profile: Option<String>,
 
-    /// Use all available profiles for logs
+    /// Use all available profiles for log
     #[arg(short, long)]
     pub all: bool,
 
@@ -24,7 +24,7 @@ pub struct Args {
     #[arg(short, long, requires = "log", value_name = "FILE")]
     pub output: Option<String>,
 
-    /// Print available profiles
+    /// List available profiles
     #[arg(short, long)]
     pub list: bool,
 

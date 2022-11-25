@@ -1,4 +1,5 @@
 use crate::config::Profile;
+use colored::*;
 use std::process::Command;
 
 pub fn log_profiles(profiles: Vec<&Profile>) -> String {
@@ -10,13 +11,16 @@ pub fn log_profiles(profiles: Vec<&Profile>) -> String {
             let log = log_from_logger(&logger);
             if let Some(log) = log {
                 out.push(log); // push the logs
+            } else {
+                println!("{} '{}'", "Command failed:".red(), logger.yellow()); // print failure
             }
         }
     }
     out.join("\n\n")
 }
+
 fn log_from_logger(logger: &str) -> Option<String> {
-    let mut logger = logger.split_whitespace();
+    let mut logger = logger.trim().split_whitespace();
     let cmd = logger.next()?;
     let args: Vec<_> = logger.collect();
     let out = Command::new(cmd).args(args).output().ok()?;
