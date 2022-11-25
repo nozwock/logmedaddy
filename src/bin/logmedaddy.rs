@@ -4,16 +4,21 @@ use std::{fs::File, io::Write, path::Path, process::exit};
 
 use logmedaddy::{defines, log_profiles, Args};
 
+#[derive(Debug)]
+enum OutputType<'a> {
+    File(&'a Path),
+    Stdout,
+}
+
 fn main() -> anyhow::Result<()> {
     let cli = Args::parse();
     let cfg = logmedaddy::Config::load();
 
-    let log_path = if let Some(out) = &cli.output {
-        out
+    let output_type = if let Some(out) = &cli.output {
+        OutputType::File(Path::new(out))
     } else {
-        "logmedaddy.log"
+        OutputType::Stdout
     };
-    let log_path = Path::new(log_path);
 
     if cli.list {
         let space = " ".repeat(4);
@@ -33,9 +38,14 @@ fn main() -> anyhow::Result<()> {
 
     if cli.all {
         let log = log_profiles(cfg.profiles.iter().collect::<Vec<_>>());
-        File::create(log_path)?.write_all(log.as_bytes())?;
-        println!("{} {:?}", "Log successfully saved at".green(), log_path);
-    }
+        match output_type {
+            OutputType::File(path) => {
+                File::create(path)?.write_all(log.as_bytes())?;
+                println!("{} {:?}", "Log successfully saved at".green(), path);
+            }
+            OutputType::Stdout => print!("{}", log),
+        };
+    };
 
     if !cli.profile.is_empty() {
         let filtered_profiles = cfg
@@ -58,15 +68,22 @@ fn main() -> anyhow::Result<()> {
         };
 
         let log = log_profiles(filtered_profiles);
-        File::create(log_path)?.write_all(log.as_bytes())?;
-        println!("{} {:?}", "Log successfully saved at".green(), log_path);
+
+        match output_type {
+            OutputType::File(path) => {
+                File::create(path)?.write_all(log.as_bytes())?;
+                println!("{} {:?}", "Log successfully saved at".green(), path);
+            }
+            OutputType::Stdout => print!("{}", log),
+        };
     };
 
+    // TODO*: option to panic upon log failure
+    // TODO*: option to split the output log file by profile names
     // TODO?: number profiles; mention profiles by number
-    // TODO: option to panic upon log fail
-    // TODO: option to split the output log file by profile names
-    // // TODO: ability to pass multiple profiles (DONE)
     // TODO: auto completion for shell?
+    // TODO: add more default loggers/profiles
+    // // TODO!: by default, print log to stdout (DONE)
 
     Ok(())
 }
