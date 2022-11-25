@@ -37,27 +37,35 @@ fn main() -> anyhow::Result<()> {
         println!("{} {:?}", "Log successfully saved at".green(), log_path);
     }
 
-    if let Some(profile) = &cli.profile {
-        match cfg.profiles.iter().find(|&x| &x.name == profile) {
-            Some(profile) => {
-                let log = log_profiles(vec![profile]);
-                File::create(log_path)?.write_all(log.as_bytes())?;
-                println!("{} {:?}", "Log successfully saved at".green(), log_path);
+    if !cli.profile.is_empty() {
+        let filtered_profiles = cfg
+            .profiles
+            .iter()
+            .filter(|prof| cli.profile.contains(&prof.name))
+            .collect::<Vec<_>>();
+
+        if filtered_profiles.len() != cli.profile.len() {
+            let filtered_profile_names = filtered_profiles
+                .iter()
+                .map(|prof| &prof.name)
+                .collect::<Vec<_>>();
+            for cli_profile in &cli.profile {
+                if !filtered_profile_names.contains(&cli_profile) {
+                    println!("{} '{}'", "Profile not found:".red(), cli_profile.yellow());
+                }
             }
-            None => {
-                println!("{} '{}'", "Profile not found:".red(), profile.yellow());
-                exit(1);
-            }
+            exit(69);
         };
+
+        let log = log_profiles(filtered_profiles);
+        File::create(log_path)?.write_all(log.as_bytes())?;
+        println!("{} {:?}", "Log successfully saved at".green(), log_path);
     };
 
-    // // TODO: add an -o option
-    // // TODO: obv impl the -p and -l options
-    // // TODO: --config_path flag to print config path
-    // TODO:? number profiles; mention profiles by number
+    // TODO?: number profiles; mention profiles by number
     // TODO: option to panic upon log fail
-    // TODO: option to split the output log file by profiles
-    // TODO: ability to pass multiple profiles
+    // TODO: option to split the output log file by profile names
+    // // TODO: ability to pass multiple profiles (DONE)
     // TODO: auto completion for shell?
 
     Ok(())

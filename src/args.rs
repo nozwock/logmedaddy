@@ -12,9 +12,9 @@ use clap::{ArgGroup, Parser};
                 .args(["profile", "all"])
         ))]
 pub struct Args {
-    /// Use the given profile for log
+    /// Use the given profiles for log
     #[arg(short, long)]
-    pub profile: Option<String>,
+    pub profile: Vec<String>,
 
     /// Use all available profiles for log
     #[arg(short, long)]
