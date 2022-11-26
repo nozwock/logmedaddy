@@ -28,6 +28,10 @@ pub struct Args {
     #[arg(short, long)]
     pub list: bool,
 
+    /// Force panic on any log command failure
+    #[arg(long, requires = "log")]
+    pub panic: bool,
+
     /// Print config path
     #[arg(long)]
     pub config_path: bool,
