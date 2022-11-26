@@ -2,7 +2,7 @@ use clap::Parser;
 use colored::*;
 use std::{fs::File, io::Write, path::Path, process::exit};
 
-use logmedaddy::{defines, log_profiles, Args};
+use logmedaddy::{defines, Args, Logger};
 
 #[derive(Debug)]
 enum OutputType<'a> {
@@ -37,7 +37,7 @@ fn main() -> anyhow::Result<()> {
     };
 
     if cli.all {
-        let log = log_profiles(cfg.profiles.iter().collect::<Vec<_>>());
+        let log = Logger::from_profiles(&cfg.profiles).to_string_lossy();
         match output_type {
             OutputType::File(path) => {
                 File::create(path)?.write_all(log.as_bytes())?;
@@ -50,7 +50,7 @@ fn main() -> anyhow::Result<()> {
     if !cli.profile.is_empty() {
         let filtered_profiles = cfg
             .profiles
-            .iter()
+            .into_iter()
             .filter(|prof| cli.profile.contains(&prof.name))
             .collect::<Vec<_>>();
 
@@ -61,14 +61,13 @@ fn main() -> anyhow::Result<()> {
                 .collect::<Vec<_>>();
             for cli_profile in &cli.profile {
                 if !filtered_profile_names.contains(&cli_profile) {
-                    println!("{} '{}'", "Profile not found:".red(), cli_profile.yellow());
+                    eprintln!("{} '{}'", "Profile not found:".red(), cli_profile.yellow());
                 }
             }
             exit(69);
         };
 
-        let log = log_profiles(filtered_profiles);
-
+        let log = Logger::from_profiles(&filtered_profiles).to_string_lossy();
         match output_type {
             OutputType::File(path) => {
                 File::create(path)?.write_all(log.as_bytes())?;
@@ -79,11 +78,10 @@ fn main() -> anyhow::Result<()> {
     };
 
     // TODO*: option to panic upon log failure
-    // TODO*: option to split the output log file by profile names
-    // TODO?: number profiles; mention profiles by number
-    // TODO: auto completion for shell?
-    // TODO: add more default loggers/profiles
-    // // TODO!: by default, print log to stdout (DONE)
+    // TODO*: add more default loggers/profiles
+    // TODO?: option to split the output log file by profile names
+    // TODO?: numbered profiles; can mention profiles by their number
+    // TODO?: auto completion for shell?
 
     Ok(())
 }
