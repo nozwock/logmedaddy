@@ -95,7 +95,6 @@ fn main() -> anyhow::Result<()> {
         };
     };
 
-    // TODO*: add more default loggers/profiles
     // TODO?: option to split the output log file by profile names
     // TODO?: numbered profiles; can mention profiles by their number
     // TODO?: auto completion for shell?

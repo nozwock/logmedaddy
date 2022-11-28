@@ -15,13 +15,27 @@ pub struct Profile {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            profiles: vec![Profile {
-                name: "systemd".to_owned(),
-                loggers: vec![
-                    "journalctl -b".to_owned(),
-                    "systemd-analyze blame".to_owned(),
-                ],
-            }],
+            profiles: vec![
+                Profile {
+                    name: "systemd".to_owned(),
+                    loggers: vec![
+                        "journalctl -b".to_owned(),
+                        "systemd-analyze blame".to_owned(),
+                    ],
+                },
+                Profile {
+                    name: "hwinfo".to_owned(),
+                    loggers: vec!["inxi -Fxxc0z".to_owned(), "hwinfo --short".to_owned()],
+                },
+                Profile {
+                    name: "system".to_owned(),
+                    loggers: vec!["cat /etc/fstab".to_owned(), "lsblk -f -o+SIZE".to_owned()],
+                },
+                Profile {
+                    name: "boot".to_owned(),
+                    loggers: vec!["sudo cat /boot/grub/grub.cfg".to_owned()],
+                },
+            ],
         }
     }
 }
